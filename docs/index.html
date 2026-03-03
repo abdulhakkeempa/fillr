@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fillr - Make documentation commands editable. A tiny developer tool for Chrome that transforms placeholders into editable fields.">
+  <title>Fillr - Make documentation commands editable</title>
+  
+  <style>
+    /* ============================================
+       CSS CUSTOM PROPERTIES (Design Tokens)
+       ============================================ */
+    :root {
+      /* Colors - Light Mode */
+      --bg-primary: #fafafa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f5f5f5;
+      --text-primary: #171717;
+      --text-secondary: #525252;
+      --text-tertiary: #737373;
+      --border-color: #e5e5e5;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --success: #10b981;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+      
+      /* Spacing */
+      --space-xs: 8px;
+      --space-sm: 16px;
+      --space-md: 24px;
+      --space-lg: 32px;
+      --space-xl: 48px;
+      --space-2xl: 64px;
+      --space-3xl: 96px;
+      --space-4xl: 120px;
+      
+      /* Typography */
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      
+      /* Border Radius */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+    
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #171717;
+        --bg-tertiary: #262626;
+        --text-primary: #ededed;
+        --text-secondary: #a3a3a3;
+        --text-tertiary: #737373;
+        --border-color: #262626;
+        --accent: #818cf8;
+        --accent-hover: #6366f1;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+      }
+    }
+    
+    /* ============================================
+       RESET & BASE STYLES
+       ============================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* ============================================
+       NAVBAR
+       ============================================ */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Add transparency for glass effect */
+    @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+      nav {
+        background: rgba(250, 250, 250, 0.8);
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background: rgba(23, 23, 23, 0.8);
+        }
+      }
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .nav-logo:hover {
+      color: var(--accent);
+    }
+    
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+    
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+    
+    .nav-cta {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .nav-cta .button {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+    
+    /* Mobile menu toggle */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-xs);
+      color: var(--text-primary);
+    }
+    
+    .nav-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: currentColor;
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .nav-toggle {
+        display: block;
+      }
+      
+      .nav-links {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        flex-direction: column;
+        gap: 0;
+        padding: var(--space-md) 0;
+        display: none;
+      }
+      
+      .nav-links.active {
+        display: flex;
+      }
+      
+      .nav-links li {
+        width: 100%;
+        text-align: center;
+        padding: var(--space-sm) var(--space-md);
+      }
+      
+      .nav-cta {
+        flex-direction: column;
+        width: 100%;
+        padding: 0 var(--space-md);
+      }
+      
+      .nav-cta .button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      margin-bottom: var(--space-md);
+    }
+    
+    h2 {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      margin-bottom: var(--space-lg);
+    }
+    
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    p {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-md);
+    }
+    
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    a:hover {
+      color: var(--accent-hover);
+    }
+    
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    
+    section {
+      padding: var(--space-4xl) 0;
+    }
+    
+    /* Reduce spacing on mobile */
+    @media (max-width: 768px) {
+      section {
+        padding: var(--space-3xl) 0;
+      }
+    }
+    
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-family: var(--font-sans);
+    }
+    
+    .button-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .button-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .button-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-color);
+    }
+    
+    .button-secondary:hover {
+      border-color: var(--text-secondary);
+      transform: translateY(-1px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    
+    /* ============================================
+       CODE BLOCKS
+       ============================================ */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+    
+    .code-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .code-block code {
+      display: block;
+      color: var(--text-primary);
+      line-height: 1.7;
+      white-space: pre;
+    }
+    
+    /* Placeholder styling - mimics the extension's appearance */
+    .placeholder {
+      background: var(--accent);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      display: inline-block;
+    }
+    
+    .placeholder-edited {
+      background: var(--success);
+    }
+    
+    /* ============================================
+       ANIMATED WORKFLOW DEMO
+       ============================================ */
+    
+    /* Container for the animated demo */
+    .workflow-demo {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-lg);
+      max-width: 700px;
+      margin: var(--space-3xl) auto;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Code block container */
+    .workflow-code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      position: relative;
+      margin-bottom: var(--space-md);
+    }
+    
+    /* Animated placeholder - starts as placeholder, then "types" the value */
+    .workflow-placeholder {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+      min-width: 80px;
+      text-align: center;
+    }
+    
+    /* Initial placeholder text */
+    .workflow-placeholder::before {
+      content: attr(data-placeholder);
+      display: block;
+      animation: fadeOutPlaceholder 8s ease-in-out infinite;
+    }
+    
+    /* Typed value that appears */
+    .workflow-placeholder::after {
+      content: attr(data-value);
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      right: 6px;
+      opacity: 0;
+      animation: typeIn 8s ease-in-out infinite;
+    }
+    
+    /* Typing animation - simulates character-by-character typing */
+    @keyframes typeIn {
+      0%, 20% {
+        opacity: 0;
+        width: 0;
+      }
+      25% {
+        opacity: 1;
+        width: 20%;
+      }
+      30% {
+        width: 40%;
+      }
+      35% {
+        width: 60%;
+      }
+      40% {
+        width: 80%;
+      }
+      45%, 100% {
+        opacity: 1;
+        width: 100%;
+      }
+    }
+    
+    /* Fade out original placeholder text */
+    @keyframes fadeOutPlaceholder {
+      0%, 20% {
+        opacity: 1;
+      }
+      25%, 100% {
+        opacity: 0;
+      }
+    }
+    
+    /* Change placeholder background color when "edited" */
+    .workflow-placeholder {
+      animation: placeholderColorChange 8s ease-in-out infinite;
+    }
+    
+    @keyframes placeholderColorChange {
+      0%, 20% {
+        background: var(--accent);
+      }
+      45%, 100% {
+        background: var(--success);
+      }
+    }
+    
+    /* Cursor blink effect during typing */
+    .workflow-placeholder::after {
+      border-right: 2px solid white;
+      animation: typeIn 8s ease-in-out infinite, blinkCursor 8s step-end infinite;
+    }
+    
+    @keyframes blinkCursor {
+      0%, 20% {
+        border-right-color: transparent;
+      }
+      25%, 27% {
+        border-right-color: white;
+      }
+      28%, 30% {
+        border-right-color: transparent;
+      }
+      31%, 33% {
+        border-right-color: white;
+      }
+      34%, 36% {
+        border-right-color: transparent;
+      }
+      37%, 39% {
+        border-right-color: white;
+      }
+      40%, 42% {
+        border-right-color: transparent;
+      }
+      43%, 45% {
+        border-right-color: white;
+      }
+      46%, 100% {
+        border-right-color: transparent;
+      }
+    }
+    
+    /* Copy button animation */
+    .workflow-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 10px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: visible;
+      animation: buttonPulse 8s ease-in-out infinite;
+    }
+    
+    /* Button press animation */
+    @keyframes buttonPulse {
+      0%, 50% {
+        transform: scale(1);
+        box-shadow: var(--shadow-sm);
+      }
+      55% {
+        transform: scale(0.95);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+      60%, 100% {
+        transform: scale(1);
+        box-shadow: var(--shadow-sm);
+      }
+    }
+    
+    /* Success checkmark that appears after "copy" */
+    .workflow-copy-btn::after {
+      content: '✓';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: var(--success);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(0);
+      animation: showCheckmark 8s ease-in-out infinite;
+    }
+    
+    @keyframes showCheckmark {
+      0%, 60% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+      }
+      65% {
+        opacity: 1;
+        transform: scale(1.2) rotate(0deg);
+      }
+      70% {
+        transform: scale(1) rotate(0deg);
+      }
+      85% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+      95%, 100% {
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+      }
+    }
+    
+    /* Subtle glow effect on the code block during interaction */
+    .workflow-code {
+      animation: codeBlockGlow 8s ease-in-out infinite;
+    }
+    
+    @keyframes codeBlockGlow {
+      0%, 20% {
+        box-shadow: none;
+      }
+      25%, 50% {
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+      }
+      55%, 100% {
+        box-shadow: none;
+      }
+    }
+    
+    /* Demo label */
+    .workflow-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .workflow-demo {
+        padding: var(--space-lg);
+      }
+      
+      .workflow-code {
+        font-size: 0.8rem;
+        padding: var(--space-md);
+      }
+      
+      .workflow-placeholder {
+        min-width: 60px;
+        font-size: 0.85rem;
+      }
+    }
+    
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+    .hero {
+      text-align: center;
+      padding-top: var(--space-2xl);
+    }
+    
+    .hero h1 {
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-subtext {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-xl);
+    }
+    
+    .hero-demo {
+      margin-top: var(--space-3xl);
+      display: grid;
+      gap: var(--space-lg);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .demo-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+    }
+    
+    /* ============================================
+       PROBLEM & SOLUTION SECTIONS
+       ============================================ */
+    .problem, .solution {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .section-intro {
+      max-width: 700px;
+      margin: 0 auto var(--space-2xl);
+      text-align: center;
+    }
+    
+    .solution-grid {
+      display: grid;
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+    
+    .solution-item {
+      display: flex;
+      gap: var(--space-md);
+      align-items: start;
+    }
+    
+    .solution-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    /* ============================================
+       FEATURES GRID
+       ============================================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-top: var(--space-2xl);
+    }
+    
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      transition: all 0.2s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .feature-card h3 {
+      margin-bottom: var(--space-xs);
+    }
+    
+    .feature-card p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+    
+    /* ============================================
+       HOW IT WORKS
+       ============================================ */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-xl);
+      margin-top: var(--space-2xl);
+    }
+    
+    .step {
+      text-align: center;
+    }
+    
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+    }
+    
+    .step h3 {
+      margin-bottom: var(--space-xs);
+    }
+    
+    .step p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+    
+    /* ============================================
+       FOOTER
+       ============================================ */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: var(--space-2xl) 0;
+      text-align: center;
+    }
+    
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .footer-note {
+      font-size: 0.875rem;
+      color: var(--text-tertiary);
+    }
+    
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .button-group {
+        width: 100%;
+      }
+      
+      .button {
+        flex: 1;
+        justify-content: center;
+      }
+      
+      .solution-item {
+        flex-direction: column;
+      }
+      
+      .steps {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- ============================================
+       NAVIGATION
+       ============================================ -->
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <span>✏️</span>
+        <span>Fillr</span>
+      </a>
+      
+      <button class="nav-toggle" aria-label="Toggle navigation" onclick="toggleNav()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="https://github.com/yourusername/fillr">GitHub</a></li>
+        <li class="nav-cta">
+          <a href="https://chrome.google.com/webstore" class="button button-primary">
+            <span>Add to Chrome</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  
+  <!-- ============================================
+       HERO SECTION
+       ============================================ -->
+  <section class="hero">
+    <div class="container">
+      <h1>Make documentation commands editable.</h1>
+      <p class="hero-subtext">
+        A tiny Chrome extension that transforms placeholders in code blocks into editable fields.
+      </p>
+      
+      <div class="button-group" style="justify-content: center;">
+        <a href="https://chrome.google.com/webstore" class="button button-primary">
+          <span>Add to Chrome</span>
+        </a>
+        <a href="https://github.com/yourusername/fillr" class="button button-secondary">
+          <span>View on GitHub</span>
+        </a>
+      </div>
+      
+      <!-- Animated Workflow Demo -->
+      <div class="workflow-demo">
+        <div class="workflow-label">Watch it work</div>
+        <div class="workflow-code">
+          <code>curl -H "Authorization: Bearer <span class="workflow-placeholder" data-placeholder="<API_KEY>" data-value="sk_live_abc123xyz"></span>" \
+  https://api.example.com/users</code>
+        </div>
+        <button class="workflow-copy-btn">
+          <span>Copy Command</span>
+        </button>
+      </div>
+    </div>
+  </section>
+  
+  <!-- ============================================
+       PROBLEM SECTION
+       ============================================ -->
+  <section>
+    <div class="container">
+      <div class="section-intro">
+        <h2>The friction you know too well</h2>
+        <p>
+          You're reading documentation. You copy a command. You paste it into your terminal. 
+          Then you manually hunt for every <code><placeholder></code> and replace it. 
+          Hope you didn't miss one.
+        </p>
+      </div>
+      
+      <div class="problem">
+        <div class="code-block">
+          <code>docker run -p <span class="placeholder"><port></span>:8080 \
+  -e DATABASE_URL=<span class="placeholder">{db-url}</span> \
+  -e API_KEY=<span class="placeholder"><your-key></span> \
+  myapp:latest</code>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- ============================================
+       SOLUTION SECTION
+       ============================================ -->
+  <section style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-intro">
+        <h2>Fillr makes placeholders editable</h2>
+        <p>
+          Click on any placeholder to edit it inline. Copy the final command with one click. 
+          No more manual find-and-replace.
+        </p>
+      </div>
+      
+      <div class="solution-grid">
+        <div class="solution-item">
+          <div class="solution-icon">✏️</div>
+          <div>
+            <h3>Inline editing</h3>
+            <p>Placeholders become editable fields right on the page. Click, type, done.</p>
+          </div>
+        </div>
+        
+        <div class="solution-item">
+          <div class="solution-icon">📋</div>
+          <div>
+            <h3>One-click copy</h3>
+            <p>Copy button appears automatically. Get the final command with your values filled in.</p>
+          </div>
+        </div>
+        
+        <div class="solution-item">
+          <div class="solution-icon">🌐</div>
+          <div>
+            <h3>Works everywhere</h3>
+            <p>Detects code blocks on most documentation sites. Handles dynamic content from React, Next.js, and more.</p>
+          </div>
+        </div>
+        
+        <div class="solution-item">
+          <div class="solution-icon">🔒</div>
+          <div>
+            <h3>Privacy first</h3>
+            <p>No tracking. No analytics. No remote calls. Everything runs locally in your browser.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- ============================================
+       FEATURES SECTION
+       ============================================ -->
+  <section id="features">
+    <div class="container">
+      <div class="section-intro">
+        <h2>Built for developers</h2>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Lightweight</h3>
+          <p>No dependencies. No bloat. Just clean JavaScript that does one thing well.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Smart detection</h3>
+          <p>Automatically finds <code><value></code> and <code>{value}</code> patterns in code blocks.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Non-intrusive</h3>
+          <p>Preserves syntax highlighting and page styling. Feels native to every site.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔓</div>
+          <h3>Open source</h3>
+          <p>MIT licensed. Full transparency. Contribute on GitHub.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🚫</div>
+          <h3>No analytics</h3>
+          <p>Zero data collection. No tracking pixels. Your commands stay private.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">⚙️</div>
+          <h3>Dynamic content</h3>
+          <p>Works with modern frameworks. Handles content loaded after page render.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- ============================================
+       HOW IT WORKS SECTION
+       ============================================ -->
+  <section id="how-it-works" style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-intro">
+        <h2>How it works</h2>
+      </div>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Install extension</h3>
+          <p>Add Fillr to Chrome from the Web Store or install from source.</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Visit documentation</h3>
+          <p>Browse any docs site. Fillr automatically detects code blocks with placeholders.</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Edit and copy</h3>
+          <p>Click placeholders to edit them. Hit the copy button to get your final command.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="https://github.com/yourusername/fillr">GitHub</a>
+          <a href="https://github.com/yourusername/fillr/blob/main/README.md">Documentation</a>
+          <a href="https://github.com/yourusername/fillr/issues">Report Issue</a>
+        </div>
+        
+        <p class="footer-note">
+          MIT License · Made for developers who read documentation
+        </p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- ============================================
+       MOBILE NAVIGATION SCRIPT
+       ============================================ -->
+  <script>
+    function toggleNav() {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.classList.toggle('active');
+    }
+    
+    // Close mobile nav when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        const navLinks = document.getElementById('navLinks');
+        navLinks.classList.remove('active');
+      });
+    });
+  </script>
+  
+</body>
+</html>
