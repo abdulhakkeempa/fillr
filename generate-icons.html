@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Extension Icons</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin: 10px;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Extension Icon Generator</h1>
+  
+  <div class="info">
+    <strong>Instructions:</strong> Right-click each canvas below and "Save image as..." to create the icon files.
+    Save them as icon16.png, icon48.png, and icon128.png in the extension directory.
+  </div>
+
+  <h2>16x16 Icon</h2>
+  <canvas id="icon16" width="16" height="16"></canvas>
+
+  <h2>48x48 Icon</h2>
+  <canvas id="icon48" width="48" height="48"></canvas>
+
+  <h2>128x128 Icon</h2>
+  <canvas id="icon128" width="128" height="128"></canvas>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      ctx.fillStyle = '#007bff';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw code brackets symbol
+      const padding = size * 0.2;
+      const lineWidth = Math.max(2, size * 0.08);
+      
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      // Left angle bracket <
+      ctx.beginPath();
+      ctx.moveTo(size * 0.6, padding);
+      ctx.lineTo(padding, size * 0.5);
+      ctx.lineTo(size * 0.6, size - padding);
+      ctx.stroke();
+      
+      // Right angle bracket >
+      ctx.beginPath();
+      ctx.moveTo(size * 0.4, padding);
+      ctx.lineTo(size - padding, size * 0.5);
+      ctx.lineTo(size * 0.4, size - padding);
+      ctx.stroke();
+      
+      // Add edit pencil indicator (small)
+      if (size >= 48) {
+        const pencilSize = size * 0.15;
+        const pencilX = size - padding - pencilSize;
+        const pencilY = size - padding - pencilSize;
+        
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.moveTo(pencilX, pencilY + pencilSize);
+        ctx.lineTo(pencilX + pencilSize, pencilY + pencilSize);
+        ctx.lineTo(pencilX + pencilSize * 0.5, pencilY);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // Generate all icons
+    drawIcon('icon16', 16);
+    drawIcon('icon48', 48);
+    drawIcon('icon128', 128);
+  </script>
+</body>
+</html>

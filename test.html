@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Placeholder Editor - Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #007bff;
+      padding-bottom: 10px;
+    }
+    
+    h2 {
+      color: #555;
+      margin-top: 40px;
+    }
+    
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .info {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    
+    .section {
+      background: white;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Code Placeholder Editor - Test Page</h1>
+  
+  <div class="info">
+    <strong>Instructions:</strong> This page contains various code blocks with placeholders. 
+    The extension should automatically detect and make them editable. Try editing the highlighted 
+    placeholders and clicking the "Copy Final Command" button!
+  </div>
+
+  <div class="section">
+    <h2>Test 1: Docker Command with Angle Brackets</h2>
+    <p>Common Docker run command with port and environment variables:</p>
+    <pre><code>docker run -d \
+  --name <container-name> \
+  -p <host-port>:8080 \
+  -e DATABASE_URL=<db-connection-string> \
+  -e API_KEY=<your-api-key> \
+  myapp:latest</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 2: Git Command with Curly Braces</h2>
+    <p>Git clone with custom branch and directory:</p>
+    <pre><code>git clone -b {branch-name} https://github.com/{username}/{repository}.git {local-directory}</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 3: Mixed Placeholders</h2>
+    <p>AWS CLI command with both placeholder styles:</p>
+    <pre><code>aws s3 cp <local-file> s3://{bucket-name}/{path/to/file} \
+  --region <aws-region> \
+  --profile {aws-profile}</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 4: Kubernetes Configuration</h2>
+    <p>kubectl command with namespace and resource:</p>
+    <pre><code>kubectl apply -f <manifest-file> \
+  --namespace=<namespace> \
+  --context=<cluster-context></code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 5: NPM/Node.js Command</h2>
+    <p>Creating a new project with custom settings:</p>
+    <pre><code>npx create-react-app {project-name} \
+  --template {template-name} \
+  --use-npm</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 6: Database Connection String</h2>
+    <p>PostgreSQL connection string:</p>
+    <pre><code>postgresql://<username>:<password>@<host>:<port>/{database-name}?sslmode=require</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 7: cURL API Request</h2>
+    <p>Making an authenticated API request:</p>
+    <pre><code>curl -X POST https://api.example.com/{endpoint} \
+  -H "Authorization: Bearer <access-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "{value}", "id": <user-id>}'</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 8: No Placeholders (Should Not Add Button)</h2>
+    <p>Regular code without any placeholders:</p>
+    <pre><code>console.log('Hello, World!');
+const sum = (a, b) => a + b;
+console.log(sum(5, 3));</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>Test 9: Complex Multi-line Script</h2>
+    <p>Bash script with multiple placeholders:</p>
+    <pre><code>#!/bin/bash
+
+# Configuration
+APP_NAME="<application-name>"
+VERSION="{version}"
+ENVIRONMENT="<environment>"
+
+# Deploy application
+echo "Deploying $APP_NAME version $VERSION to $ENVIRONMENT"
+
+docker build -t $APP_NAME:$VERSION .
+docker tag $APP_NAME:$VERSION registry.example.com/<org-name>/$APP_NAME:$VERSION
+docker push registry.example.com/<org-name>/$APP_NAME:$VERSION
+
+kubectl set image deployment/$APP_NAME \
+  $APP_NAME=registry.example.com/<org-name>/$APP_NAME:$VERSION \
+  --namespace={namespace}</code></pre>
+  </div>
+
+  <button onclick="addDynamicContent()">Test Dynamic Content (Add New Code Block)</button>
+
+  <div id="dynamic-content"></div>
+
+  <script>
+    function addDynamicContent() {
+      const container = document.getElementById('dynamic-content');
+      const newSection = document.createElement('div');
+      newSection.className = 'section';
+      newSection.innerHTML = `
+        <h2>Test 10: Dynamically Added Content</h2>
+        <p>This code block was added after page load to test MutationObserver:</p>
+        <pre><code>ssh <username>@<hostname> -p {port} -i {path/to/key}</code></pre>
+      `;
+      container.appendChild(newSection);
+    }
+  </script>
+</body>
+</html>
