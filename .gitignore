@@ -5,15 +5,39 @@ Thumbs.db
 # Editor directories
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Extension packaging
 *.zip
 *.crx
 *.pem
 
+# Node modules (if added later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build artifacts
+dist/
+build/
+
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Temporary files
 *.tmp
 *.temp
+
+# Environment files
+.env
+.env.local
+
+# Test files (keep test.html and generate-icons.html in repo)
+# Add specific test files here if needed
+
+# GitHub Actions artifacts
+.github/workflows/*.log

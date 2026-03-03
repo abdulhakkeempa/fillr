@@ -1,6 +1,9 @@
-# Code Placeholder Editor
+# Fillr
 
 A minimal, production-ready Chrome Extension (Manifest v3) that detects placeholders in code blocks and makes them editable inline.
+
+[![GitHub release](https://img.shields.io/github/v/release/yourusername/fillr)](https://github.com/yourusername/fillr/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
@@ -14,22 +17,49 @@ A minimal, production-ready Chrome Extension (Manifest v3) that detects placehol
 
 ## Installation
 
+### From GitHub Releases (Recommended)
+
+1. Go to [Releases](https://github.com/yourusername/fillr/releases)
+2. Download the latest `fillr-vX.X.X.zip`
+3. Extract the ZIP file
+4. Open Chrome and navigate to `chrome://extensions/`
+5. Enable "Developer mode" (toggle in top-right corner)
+6. Click "Load unpacked"
+7. Select the extracted `src` folder
+
 ### From Source
 
-1. Clone or download this repository
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/fillr.git
+   cd fillr
+   ```
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" (toggle in top-right corner)
 4. Click "Load unpacked"
-5. Select the extension directory
+5. Select the `src` directory
 
-### File Structure
+### Repository Structure
 
 ```
-chrome-ext/
-├── manifest.json       # Extension configuration (Manifest v3)
-├── content.js          # Core logic for placeholder detection and replacement
-├── styles.css          # Visual styling for editable placeholders and copy button
-└── README.md           # This file
+fillr/
+├── src/                    # Extension source files
+│   ├── manifest.json       # Extension configuration (Manifest v3)
+│   ├── content.js          # Core logic for placeholder detection
+│   ├── styles.css          # Visual styling for placeholders
+│   ├── icon16.png          # Extension icon (16x16)
+│   ├── icon48.png          # Extension icon (48x48)
+│   └── icon128.png         # Extension icon (128x128)
+├── docs/                   # Landing page (GitHub Pages)
+│   └── index.html          # Project website
+├── .github/
+│   └── workflows/
+│       └── release.yml     # Automated release workflow
+├── test.html               # Local testing page
+├── generate-icons.html     # Icon generator utility
+├── INSTALLATION.md         # Detailed installation guide
+├── ARCHITECTURE.md         # Technical architecture docs
+└── README.md               # This file
 ```
 
 ## Usage
@@ -146,12 +176,47 @@ The extension uses a regex pattern to detect:
 - Some sites may have Content Security Policies that interfere
 - Try refreshing the page after the extension loads
 
+## Releases
+
+This project uses automated releases via GitHub Actions. When a new version tag is pushed:
+
+1. **Create a new tag:**
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions automatically:**
+   - Creates a ZIP package from the `src` directory
+   - Generates release notes
+   - Creates a GitHub Release
+   - Attaches the ZIP file for download
+
+3. **Users can download** the ZIP from the [Releases page](https://github.com/yourusername/fillr/releases)
+
+### Version Numbering
+
+We follow [Semantic Versioning](https://semver.org/):
+- **MAJOR** version for incompatible API changes
+- **MINOR** version for new functionality (backwards compatible)
+- **PATCH** version for bug fixes (backwards compatible)
+
 ## Contributing
 
 This is a minimal, focused tool. If you find bugs or have suggestions:
 1. Check existing issues
 2. Create a detailed bug report or feature request
 3. Keep changes aligned with the "minimal and elegant" philosophy
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make changes in the `src` directory
+4. Test locally using `test.html`
+5. Commit changes: `git commit -am 'Add new feature'`
+6. Push to your fork: `git push origin feature/my-feature`
+7. Create a Pull Request
 
 ## License
 

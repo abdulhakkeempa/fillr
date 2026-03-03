@@ -1,0 +1,83 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Create extension package
+        run: |
+          cd src
+          zip -r ../fillr-v${{ steps.get_version.outputs.VERSION }}.zip \
+            manifest.json \
+            content.js \
+            styles.css \
+            icon16.png \
+            icon48.png \
+            icon128.png
+          cd ..
+      
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "## Fillr v${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Installation" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "1. Download \`fillr-v${{ steps.get_version.outputs.VERSION }}.zip\`" >> $GITHUB_OUTPUT
+          echo "2. Extract the ZIP file" >> $GITHUB_OUTPUT
+          echo "3. Open Chrome and navigate to \`chrome://extensions/\`" >> $GITHUB_OUTPUT
+          echo "4. Enable \"Developer mode\" (toggle in top-right)" >> $GITHUB_OUTPUT
+          echo "5. Click \"Load unpacked\"" >> $GITHUB_OUTPUT
+          echo "6. Select the extracted folder" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### What's Included" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "- Chrome Extension (Manifest v3)" >> $GITHUB_OUTPUT
+          echo "- Automatic placeholder detection" >> $GITHUB_OUTPUT
+          echo "- Inline editing capabilities" >> $GITHUB_OUTPUT
+          echo "- One-click copy functionality" >> $GITHUB_OUTPUT
+          echo "- Privacy-focused (no tracking)" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Documentation" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "- [Installation Guide](https://github.com/${{ github.repository }}/blob/main/INSTALLATION.md)" >> $GITHUB_OUTPUT
+          echo "- [Architecture Overview](https://github.com/${{ github.repository }}/blob/main/ARCHITECTURE.md)" >> $GITHUB_OUTPUT
+          echo "- [Full README](https://github.com/${{ github.repository }}/blob/main/README.md)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: fillr-v${{ steps.get_version.outputs.VERSION }}.zip
+          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fillr-v${{ steps.get_version.outputs.VERSION }}
+          path: fillr-v${{ steps.get_version.outputs.VERSION }}.zip
+          retention-days: 90
+
+# Made with Bob

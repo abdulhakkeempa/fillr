@@ -1,8 +1,81 @@
 # Installation Guide
 
-## Quick Start
+## For End Users
 
-### Step 1: Generate Icons
+### Option 1: Install from GitHub Releases (Recommended)
+
+1. **Download the latest release:**
+   - Visit the [Releases page](https://github.com/yourusername/fillr/releases)
+   - Download the latest `fillr-vX.X.X.zip` file
+
+2. **Extract the ZIP file:**
+   - Unzip the downloaded file to a location on your computer
+   - You'll see a folder containing the extension files
+
+3. **Load the extension in Chrome:**
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable **Developer mode** (toggle in the top-right corner)
+   - Click **Load unpacked**
+   - Select the extracted folder
+   - The extension should now appear in your extensions list
+
+4. **Test the extension:**
+   - Visit any documentation site with code blocks
+   - Look for placeholders like `<API_KEY>` or `{value}`
+   - Click on them to edit inline
+   - Use the "Copy Final Command" button to copy your edited command
+
+### Option 2: Install from Source
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/fillr.git
+   cd fillr
+   ```
+
+2. **Load the extension in Chrome:**
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable **Developer mode** (toggle in the top-right corner)
+   - Click **Load unpacked**
+   - Select the `src` directory from the cloned repository
+   - The extension should now appear in your extensions list
+
+## For Developers
+
+### Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/fillr.git
+   cd fillr
+   ```
+
+2. **Repository structure:**
+   ```
+   fillr/
+   ├── src/              # Extension source files (load this in Chrome)
+   ├── docs/             # Landing page
+   ├── test.html         # Local testing page
+   └── generate-icons.html  # Icon generator utility
+   ```
+
+3. **Load extension for development:**
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable **Developer mode**
+   - Click **Load unpacked**
+   - Select the `src` directory
+   - Make changes to files in `src/`
+   - Click the refresh icon on the extension card to reload changes
+
+4. **Test your changes:**
+   - Open `test.html` in your browser (File → Open File)
+   - You should see editable placeholders in code blocks
+   - Try editing placeholders and clicking the copy button
+   - Check the browser console for any errors
+
+### Regenerating Icons (Optional)
+
+If you need to regenerate the extension icons:
 
 1. Open `generate-icons.html` in your browser
 2. Right-click each canvas and select "Save image as..."
@@ -10,23 +83,7 @@
    - `icon16.png` (16x16 canvas)
    - `icon48.png` (48x48 canvas)
    - `icon128.png` (128x128 canvas)
-4. Place all three icon files in the extension root directory
-
-### Step 2: Load Extension in Chrome
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable **Developer mode** (toggle in the top-right corner)
-3. Click **Load unpacked**
-4. Select the `chrome-ext` directory
-5. The extension should now appear in your extensions list
-
-### Step 3: Test the Extension
-
-1. Open `test.html` in your browser (File → Open File)
-2. You should see:
-   - Yellow-highlighted editable placeholders in code blocks
-   - "Copy Final Command" buttons on code blocks with placeholders
-3. Try editing a placeholder and clicking the copy button
+4. Place all three icon files in the `src/` directory
 
 ## Verification Checklist
 
