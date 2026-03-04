@@ -2,7 +2,7 @@
 
 A minimal, production-ready Chrome Extension (Manifest v3) that detects placeholders in code blocks and makes them editable inline.
 
-[![GitHub release](https://img.shields.io/github/v/release/yourusername/fillr)](https://github.com/yourusername/fillr/releases)
+[![GitHub release](https://img.shields.io/github/v/release/abdulhakkeempa/fillr)](https://github.com/abdulhakkeempa/fillr/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -19,7 +19,7 @@ A minimal, production-ready Chrome Extension (Manifest v3) that detects placehol
 
 ### From GitHub Releases (Recommended)
 
-1. Go to [Releases](https://github.com/yourusername/fillr/releases)
+1. Go to [Releases](https://github.com/abdulhakkeempa/fillr/releases)
 2. Download the latest `fillr-vX.X.X.zip`
 3. Extract the ZIP file
 4. Open Chrome and navigate to `chrome://extensions/`
@@ -31,7 +31,7 @@ A minimal, production-ready Chrome Extension (Manifest v3) that detects placehol
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/fillr.git
+   git clone https://github.com/abdulhakkeempa/fillr.git
    cd fillr
    ```
 2. Open Chrome and navigate to `chrome://extensions/`
@@ -192,7 +192,7 @@ This project uses automated releases via GitHub Actions. When a new version tag 
    - Creates a GitHub Release
    - Attaches the ZIP file for download
 
-3. **Users can download** the ZIP from the [Releases page](https://github.com/yourusername/fillr/releases)
+3. **Users can download** the ZIP from the [Releases page](https://github.com/abdulhakkeempa/fillr/releases)
 
 ### Version Numbering
 
